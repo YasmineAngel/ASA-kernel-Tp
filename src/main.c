@@ -1,6 +1,7 @@
 #include "ioport.h"
 #include "gdt.h"
 #include "idt.h"
+#include "mmu.h"
 
 void clear_screen();				/* clear screen */
 void putc(char aChar);				/* print a single char on screen */
@@ -25,9 +26,8 @@ void main(unsigned int * mboot_info)
     puts("OK\n");
 
     puts("\t-> Setting up the MMU... ");
-    // todo !
-    puts("TODO !\n");
-    puts("\n\n");
+    setup_mmu();
+    puts("OK\n");
 
     idt_setup_irq_handler(0, empty_irq);
     idt_setup_irq_handler(1, empty_irq);
