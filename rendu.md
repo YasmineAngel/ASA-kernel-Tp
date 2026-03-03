@@ -34,7 +34,12 @@ The number of memory pages that will configured is 1024 . Which corresponds to 1
 
 ## Q8 Plan d'adressage
 
-%% à compléter
+- Configuration of page directory table : 
+    we are only required to configure the idx1 which will point to corresponding physical address of the page_table
+- Configuration of page entry table : 
+    Here we should configure all entries to the corresponding physiscal page where the first 20 bits correspond to the  physiscal page address (ex: page_table[0] points to physical address 0x00000000) , set the mode to kernel , set it as a valid entry and activate read/write bit .
+
+
 
 
 Un premier programme _user_
