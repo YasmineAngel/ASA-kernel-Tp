@@ -17,7 +17,16 @@ The other sections should be stored consecutively after the .text section with a
 
 ## Q6 Mémoire virtuelle et noyau
 
-%% à compléter
+- Since the virtual address corresponds to physiscal address the idx1 and idx2 of the my-kernel code can be caclculated :
+    - Kernel address = 0x00100000 = 0000 0000 0001 0000 0000 0000 0000 0000
+    - idx1 (top 10 bits of the virtual address) : 0000 0000 00
+    - idx2 (next 10 bits): 01 0000 0000
+- And the idx1 and idx2 of the video memory address used by putc:
+    - Video memory address : 0xB8000 = 0000 0000 0000 1011 1000 0000 0000 0000
+    - idx1 :  0000 0000 00
+    - idx2 : 00 1011 1000
+
+
 
 ## Q7 Espace mémoire
 
