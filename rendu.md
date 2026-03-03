@@ -30,7 +30,7 @@ The other sections should be stored consecutively after the .text section with a
 
 ## Q7 Espace mémoire
 
-%% à compléter
+The number of memory pages that will configured is 1024 . Which corresponds to 1024*4096 bytes = 4194304 bytes =~ 4.19 Mb of memory .
 
 ## Q8 Plan d'adressage
 
