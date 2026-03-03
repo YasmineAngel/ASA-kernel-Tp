@@ -12,7 +12,8 @@ Définir un plan d'adressage
 
 ## Q5 Adresse de compilation
 
-%% à compléter
+from observing the link.ld file : the compiled code is tored at the physical address : 0x00100000
+The other sections should be stored consecutively after the .text section with a 4096 byte alignment .
 
 ## Q6 Mémoire virtuelle et noyau
 

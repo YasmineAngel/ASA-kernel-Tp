@@ -30,3 +30,5 @@ struct Page_Entry_s {
 struct Directory_Entry_s page_directory[1024] __attribute__((aligned (PAGE_SIZE)));
 struct Page_Entry_s page_entry[1024] __attribute__((aligned (PAGE_SIZE)));
 
+
+
