@@ -28,4 +28,5 @@ struct Page_Entry_s {
 
 #define PAGE_SIZE 4096 
 struct Directory_Entry_s page_directory[1024] __attribute__((aligned (PAGE_SIZE)));
+struct Page_Entry_s page_entry[1024] __attribute__((aligned (PAGE_SIZE)));
 
