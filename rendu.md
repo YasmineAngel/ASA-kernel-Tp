@@ -56,6 +56,7 @@ Un premier programme _user_
 
 I observe the message : error accessing address 40000 over and over again .
 why ? : call_user jumped to the 4MB mark (0x400000), but the CPU hit a Page Fault because it doesn't have permission to read the memory there.
+After changing user_page_table[j].mode to 1 in setup_mmu() the error is gone .
 
 Correction
 ----------
