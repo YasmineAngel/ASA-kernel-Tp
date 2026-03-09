@@ -7,7 +7,6 @@ void clear_screen();				/* clear screen */
 void putc(char aChar);				/* print a single char on screen */
 void puts(char *aString);			/* print a string on the screen */
 void puthex(unsigned aNumber);			/* print an Hex number on screen */
-void page_fault_handler(int_regs_t *r);
 
 
 void empty_irq(int_regs_t *r) {
@@ -113,13 +112,5 @@ void putc(char c) {
   setCursor();
 }
 
-void page_fault_handler(const int_regs_t *r) {
-    uint32_t faulting_address;
-    asm volatile("mov %%cr2, %0" : "=r" (faulting_address));
-
-    puts("\nPage fault\n");
-    puts("Error accessing address: ");
-    puthex(faulting_address);
-}
 
 

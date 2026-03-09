@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include "mmu.h"
+#include "main.h"
+
 
 
 struct Directory_Entry_s {
@@ -69,6 +71,15 @@ void setup_mmu() {
     asm volatile("mov %%cr0, %0" : "=r"(cr0));
     cr0 |= 0x80010000; 
     asm volatile("mov %0, %%cr0" : : "r"(cr0));
+}
+
+void page_fault_handler(const int_regs_t *r) {
+    uint32_t faulting_address;
+    asm volatile("mov %%cr2, %0" : "=r" (faulting_address));
+
+    puts("\nPage fault\n");
+    puts("Error accessing address: ");
+    puthex(faulting_address);
 }
 
 
