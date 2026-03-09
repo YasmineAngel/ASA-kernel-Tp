@@ -32,6 +32,7 @@ struct Page_Entry_s {
 #define PAGE_SIZE 4096 
 struct Directory_Entry_s page_directory[1024] __attribute__((aligned (PAGE_SIZE)));
 struct Page_Entry_s page_entry[1024] __attribute__((aligned (PAGE_SIZE)));
+struct Page_Entry_s user_page_table[1024] __attribute__((aligned (PAGE_SIZE)));
 
 void setup_mmu() {
 
@@ -44,10 +45,22 @@ void setup_mmu() {
         page_entry[j].read_write = 1;     
         page_entry[j].mode = 1;           
     }
+    for (int j = 0; j < 1024; j++) {
+        user_page_table[j].physical_page = 1024 + j; 
+        user_page_table[j].valid = 1;          
+        user_page_table[j].read_write = 1;
+        user_page_table[j].mode = 0;
+    }
+
     page_directory[0].physical_page = ((uint32_t)page_entry) >> 12;
     page_directory[0].valid_entry = 1;
     page_directory[0].read_write = 1;
     page_directory[0].mode = 1;
+
+    page_directory[1].physical_page = ((uint32_t)user_page_table) >> 12;
+    page_directory[1].valid_entry = 1;
+    page_directory[1].read_write = 1;
+    page_directory[1].mode = 0;
 
     uint32_t pd_addr = (uint32_t)page_directory;
     asm volatile("mov %0, %%cr3" : : "r"(pd_addr));
