@@ -2,7 +2,10 @@
 #include "gdt.h"
 #include "idt.h"
 #include "mmu.h"
+#include "call_user.h"
 
+extern char _user_start;
+extern char _user_end;
 void clear_screen();				/* clear screen */
 void putc(char aChar);				/* print a single char on screen */
 void puts(char *aString);			/* print a string on the screen */
@@ -37,7 +40,8 @@ void main(unsigned int * mboot_info)
 
     /* minimal setup done ! */
 
-
+    puts("Jumping to user land...\n");
+    call_user((void (*)())&_user_start, (void*)0x00410000);
     puts("Going idle\n");
     for(;;) ; /* nothing more to do... really nothing ! */
 }

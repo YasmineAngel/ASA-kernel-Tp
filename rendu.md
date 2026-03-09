@@ -54,7 +54,8 @@ Un premier programme _user_
 
 ## Q16 activation _user land_
 
-%% à completer
+I observe the message : error accessing address 40000 over and over again .
+why ? : call_user jumped to the 4MB mark (0x400000), but the CPU hit a Page Fault because it doesn't have permission to read the memory there.
 
 Correction
 ----------

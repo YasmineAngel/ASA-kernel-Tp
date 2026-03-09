@@ -62,7 +62,7 @@ void setup_mmu() {
     page_directory[1].physical_page = ((uint32_t)user_page_table) >> 12;
     page_directory[1].valid_entry = 1;
     page_directory[1].read_write = 1;
-    page_directory[1].mode = 0;
+    page_directory[1].mode = 1;
 
     uint32_t pd_addr = (uint32_t)page_directory;
     asm volatile("mov %0, %%cr3" : : "r"(pd_addr));
