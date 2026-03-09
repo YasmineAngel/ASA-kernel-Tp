@@ -28,5 +28,15 @@ SECTIONS
 		*(.stack)
 		. = ALIGN(4096);
 	}
+	. = 0x00400000;
+
+	.user : AT(ADDR(.user))
+	{
+        _user_start = .;
+        *(.user_text)
+		*(.user_data)
+        . = ALIGN(4096);
+        _user_end = .;
+    }
 	end = .; _end = .; __end = .;
 }
