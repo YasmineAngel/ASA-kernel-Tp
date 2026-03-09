@@ -47,7 +47,10 @@ Un premier programme _user_
 
 ## Q12 Plan d'adressage _user_
 
-%% à completer
+- Address range : 0x00400000 to 0x007FFFFF
+- Smallest available Address : 0x00400000 (index 1 * 1024 entries * 4096 bytes = 4 194 304 bytes)
+- largest accessible address : 0x007FFFFF (the end of the second 4 MB range (2 * 4,194,304) - 1 = 8 388 607 bytes)
+
 
 ## Q16 activation _user land_
 
