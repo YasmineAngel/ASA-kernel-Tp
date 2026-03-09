@@ -71,3 +71,5 @@ void setup_mmu() {
     asm volatile("mov %0, %%cr0" : : "r"(cr0));
 }
 
+
+

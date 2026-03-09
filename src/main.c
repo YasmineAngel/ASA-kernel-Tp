@@ -7,6 +7,8 @@ void clear_screen();				/* clear screen */
 void putc(char aChar);				/* print a single char on screen */
 void puts(char *aString);			/* print a string on the screen */
 void puthex(unsigned aNumber);			/* print an Hex number on screen */
+void page_fault_handler(int_regs_t *r);
+
 
 void empty_irq(int_regs_t *r) {
 }
@@ -24,7 +26,7 @@ void main(unsigned int * mboot_info)
     puts("\t-> Setting up the IDT... ");
     setup_idt();
     puts("OK\n");
-
+    idt_setup_int_handler(14, page_fault_handler);
     puts("\t-> Setting up the MMU... ");
     setup_mmu();
     puts("OK\n");
@@ -109,6 +111,15 @@ void putc(char c) {
       break;
   }
   setCursor();
+}
+
+void page_fault_handler(const int_regs_t *r) {
+    uint32_t faulting_address;
+    asm volatile("mov %%cr2, %0" : "=r" (faulting_address));
+
+    puts("\nPage fault\n");
+    puts("Error accessing address: ");
+    puthex(faulting_address);
 }
 
 
