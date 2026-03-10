@@ -83,7 +83,7 @@ Correction
     instruction pointer (EIP) 100FC5
 - The shell commands I use to determmine the problem : 
     - nm iso/boot/mykernel.bin | sort | grep -i "100FC5" -> result : 00100fc5 T puts
-    this is the address of the puts function . 
+    this is the address of the puts function .
 
 
 

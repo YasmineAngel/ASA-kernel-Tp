@@ -10,6 +10,7 @@ void clear_screen();				/* clear screen */
 void putc(char aChar);				/* print a single char on screen */
 void puts(char *aString);			/* print a string on the screen */
 void puthex(unsigned aNumber);			/* print an Hex number on screen */
+void sys_call_handler(int_regs_t *r);
 
 
 void empty_irq(int_regs_t *r) {
@@ -29,6 +30,7 @@ void main(unsigned int * mboot_info)
     setup_idt();
     puts("OK\n");
     idt_setup_int_handler(14, page_fault_handler);
+    idt_setup_int_handler(87, sys_call_handler);
     puts("\t-> Setting up the MMU... ");
     setup_mmu();
     puts("OK\n");
@@ -39,7 +41,7 @@ void main(unsigned int * mboot_info)
     __asm volatile("sti");
 
     /* minimal setup done ! */
-
+    
     puts("Jumping to user land...\n");
     puts("_user_start is at: ");
     puthex((uint32_t)&_user_start);
@@ -117,6 +119,10 @@ void putc(char c) {
       break;
   }
   setCursor();
+}
+
+void sys_call_handler(int_regs_t *r) {
+    puts((char *)r->edx);
 }
 
 
