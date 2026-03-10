@@ -45,7 +45,7 @@ void setup_mmu() {
         page_entry[j].physical_page = j;  
         page_entry[j].valid = 1;          
         page_entry[j].read_write = 1;     
-        page_entry[j].mode = 1;           
+        page_entry[j].mode = 0;           
     }
     for (int j = 0; j < 1024; j++) {
         user_page_table[j].physical_page = 1024 + j; 
@@ -80,6 +80,12 @@ void page_fault_handler(const int_regs_t *r) {
     puts("\nPage fault\n");
     puts("Error accessing address: ");
     puthex(faulting_address);
+    puts("\nInstruction pointer (EIP): ");
+    puthex(r->eip);
+    puts("\n");
+    for (;;) {
+        asm volatile("hlt");
+    }
 }
 
 
