@@ -54,15 +54,40 @@ Un premier programme _user_
 
 ## Q16 activation _user land_
 
-I observe the message : I got a page fault
-why ? : it tries to call puts which is in kernel memory, inaccessible from user mode.
+- I observe the message : I got a page fault
+- why ? : it tries to call puts which is in kernel memory, inaccessible from user mode.
 
 Correction
 ----------
 
 ## Q18 chercher la faute
+- The error I got: 
+    jumping to user land ...
+    user_start is at 400000 
+    page fault 
+    error accessing addres 102000
+    instruction pointer (EIP) 102000
 
-%% à completer
+- The shell commands I use to determmine the problem : 
+    - nm iso/boot/mykernel.bin | sort | grep -i "102000" -> result : 00102000 T __x86.get_pc_thunk.ax
+    - objdump -d -S iso/boot/mykernel.bin | grep -A10 "102000" -> result : in the main function : 
+        400007:	e8 f4 1f d0 ff       	call   102000 <__x86.get_pc_thunk.ax>
+        40000c:	05 f4 2f d0 ff       	add    $0xffd02ff4,%eax
+        puts("Hello world from user land!\n");
+    - I fixed it by removing -fPIC  from the makefile  znf replacing it with -fno-pic to force gcc to never generate PIC code (Our compiler was generating "position-independent" executables. Position-independent means the operating system can load the program's machine code at any address in (virtual) memory and it'll still work) 
+- After running the command make and make run i got this :
+    jumping to user land ...
+    user_start is at 400000 
+    page fault 
+    error accessing addres 100FC5
+    instruction pointer (EIP) 100FC5
+- The shell commands I use to determmine the problem : 
+    - nm iso/boot/mykernel.bin | sort | grep -i "100FC5" -> result : 00100fc5 T puts
+    this is the address of the puts function . 
+
+
+
+
 
 Interposition
 -------------
