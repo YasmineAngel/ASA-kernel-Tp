@@ -3,11 +3,12 @@
 #include "idt.h"
 #include "mmu.h"
 #include "call_user.h"
+#include "syscall.h"
 
 extern char _user_start;
 extern char _user_end;
-void clear_screen();				/* clear screen */
-void putc(char aChar);				/* print a single char on screen */
+void kclear_screen();				/* clear screen */
+void kputc(char aChar);				/* print a single char on screen */
 void kputs(char *aString);			/* print a string on the screen */
 void puthex(unsigned aNumber);			/* print an Hex number on screen */
 void sys_call_handler(int_regs_t *r);
@@ -20,7 +21,7 @@ void empty_irq(int_regs_t *r) {
 void main(unsigned int * mboot_info)
 {
     /* clear the screen */
-    clear_screen();
+    kclear_screen();
     kputs("Early boot.\n"); 
     kputs("\t-> Setting up the GDT... ");
     gdt_init_default();
@@ -56,7 +57,7 @@ void main(unsigned int * mboot_info)
 unsigned char *video_memory = (unsigned char *) 0xB8000;
 
 /* clear screen */
-void clear_screen() {
+void kclear_screen() {
   int i;
   for(i=0;i<80*25;i++) { 			/* for each one of the 80 char by 25 lines */
     video_memory[i*2+1]=0x0F;			/* color is set to black background and white char */
@@ -68,7 +69,7 @@ void clear_screen() {
 void kputs(char *aString) {
   char *current_char=aString;
   while(*current_char!=0) {
-    putc(*current_char++);
+    kputc(*current_char++);
   }
 }
 
@@ -80,11 +81,11 @@ void puthex(unsigned aNumber) {
   for(i=28;i>=0;i-=4) {
     int k=(aNumber>>i)&0xF;
     if(k!=0 || started) {
-      putc(hex_digit[k]);
+      kputc(hex_digit[k]);
       started=1;
     }
   }
-  if(!started) putc('0');
+  if(!started) kputc('0');
 }
 
 /* print a char on the screen */
@@ -99,14 +100,14 @@ void setCursor() {
   _outb(0x3d5,(cursor_offset&0xFF));
 }
 
-void putc(char c) {
+void kputc(char c) {
   if(cursor_x>79) {
     cursor_x=0;
     cursor_y++;
   }
   if(cursor_y>24) {
     cursor_y=0;
-    clear_screen();
+    kclear_screen();
   }
   switch(c) {					/* deal with a special char */
     case '\r': cursor_x=0; break;		/* carriage return */
@@ -123,7 +124,17 @@ void putc(char c) {
 }
 
 void sys_call_handler(int_regs_t *r) {
-  kputs((char *)r->edx);
+  switch (r->eax) {
+        case SYS_PUTS:
+            kputs((char *)r->edx);
+            break;
+        case SYS_PUTC:
+            kputc((char)r->edx);
+            break;
+        case SYS_CLEAR:
+            kclear_screen();
+            break;
+    }
 }
 
 
