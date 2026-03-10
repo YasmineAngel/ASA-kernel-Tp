@@ -77,16 +77,16 @@ void page_fault_handler(const int_regs_t *r) {
     uint32_t faulting_address;
     asm volatile("mov %%cr2, %0" : "=r" (faulting_address));
 
-    puts("\nPage fault\n");
-    puts("Error accessing address: ");
+    kputs("\nPage fault\n");
+    kputs("Error accessing address: ");
     puthex(faulting_address);
-    puts("\nInstruction pointer (EIP): ");
+    kputs("\nInstruction pointer (EIP): ");
     puthex(r->eip);
-    puts("\n");
+    kputs("\n");
     for (;;) {
         asm volatile("hlt");
     }
-    
+
 }
 
 

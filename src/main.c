@@ -8,7 +8,7 @@ extern char _user_start;
 extern char _user_end;
 void clear_screen();				/* clear screen */
 void putc(char aChar);				/* print a single char on screen */
-void puts(char *aString);			/* print a string on the screen */
+void kputs(char *aString);			/* print a string on the screen */
 void puthex(unsigned aNumber);			/* print an Hex number on screen */
 void sys_call_handler(int_regs_t *r);
 
@@ -21,19 +21,19 @@ void main(unsigned int * mboot_info)
 {
     /* clear the screen */
     clear_screen();
-    puts("Early boot.\n"); 
-    puts("\t-> Setting up the GDT... ");
+    kputs("Early boot.\n"); 
+    kputs("\t-> Setting up the GDT... ");
     gdt_init_default();
-    puts("OK\n");
+    kputs("OK\n");
 
-    puts("\t-> Setting up the IDT... ");
+    kputs("\t-> Setting up the IDT... ");
     setup_idt();
-    puts("OK\n");
+    kputs("OK\n");
     idt_setup_int_handler(14, page_fault_handler);
     idt_setup_int_handler(87, sys_call_handler);
-    puts("\t-> Setting up the MMU... ");
+    kputs("\t-> Setting up the MMU... ");
     setup_mmu();
-    puts("OK\n");
+    kputs("OK\n");
 
     idt_setup_irq_handler(0, empty_irq);
     idt_setup_irq_handler(1, empty_irq);
@@ -42,12 +42,13 @@ void main(unsigned int * mboot_info)
 
     /* minimal setup done ! */
     
-    puts("Jumping to user land...\n");
-    puts("_user_start is at: ");
+    kputs("Jumping to user land...\n");
+    kputs("_user_start is at: ");
     puthex((uint32_t)&_user_start);
-    puts("\n");
+    kputs("\n");
+    kputs("calling user\n");
     call_user((void (*)())&_user_start, (void*)0x00410000);
-    puts("Going idle\n");
+    kputs("Going idle\n");
     for(;;) ; /* nothing more to do... really nothing ! */
 }
 
@@ -64,7 +65,7 @@ void clear_screen() {
 }
 
 /* print a string on the screen */
-void puts(char *aString) {
+void kputs(char *aString) {
   char *current_char=aString;
   while(*current_char!=0) {
     putc(*current_char++);
@@ -122,7 +123,7 @@ void putc(char c) {
 }
 
 void sys_call_handler(int_regs_t *r) {
-    puts((char *)r->edx);
+  kputs((char *)r->edx);
 }
 
 

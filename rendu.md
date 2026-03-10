@@ -85,8 +85,8 @@ Correction
     - nm iso/boot/mykernel.bin | sort | grep -i "100FC5" -> result : 00100fc5 T puts
     this is the address of the puts function .
 
-
-
+## Q19 
+ I had an issue that I fixed by switching the declerations of the functions in user.c : user_main was defined after puts in user.c, so puts landed at 0x400000 = _user_start. so I moved user_main before puts in the source file so it is the first function placed at 0x400000.
 
 
 Interposition
