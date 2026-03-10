@@ -41,6 +41,9 @@ void main(unsigned int * mboot_info)
     /* minimal setup done ! */
 
     puts("Jumping to user land...\n");
+    puts("_user_start is at: ");
+    puthex((uint32_t)&_user_start);
+    puts("\n");
     call_user((void (*)())&_user_start, (void*)0x00410000);
     puts("Going idle\n");
     for(;;) ; /* nothing more to do... really nothing ! */

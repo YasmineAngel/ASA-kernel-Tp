@@ -57,7 +57,7 @@ void setup_mmu() {
     page_directory[0].physical_page = ((uint32_t)page_entry) >> 12;
     page_directory[0].valid_entry = 1;
     page_directory[0].read_write = 1;
-    page_directory[0].mode = 1;
+    page_directory[0].mode = 0;
 
     page_directory[1].physical_page = ((uint32_t)user_page_table) >> 12;
     page_directory[1].valid_entry = 1;
