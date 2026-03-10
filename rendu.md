@@ -94,7 +94,7 @@ Interposition
 
 ## Q22 Interposition d’appel
 
-%% à completer
+ By imposing a controlled entry point : the only way into the kernel from user mode is through int $87 , The kernel then controls exactly what happens via sys_call_handler which means that the user only provides a service number in %eax and an argument in %edx, it cannot choose which kernel function to call or how .
 
 protection de pile
 ------------------
