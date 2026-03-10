@@ -86,6 +86,7 @@ void page_fault_handler(const int_regs_t *r) {
     for (;;) {
         asm volatile("hlt");
     }
+    
 }
 
 
