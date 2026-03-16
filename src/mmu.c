@@ -6,6 +6,9 @@ extern char _begin_of_user_space;
 extern char _end_of_user_space;
 extern char _user_stack_guard;
 
+int page_alloc[4096];
+int first_free_page;
+
 
 struct Directory_Entry_s {
     uint32_t valid_entry      : 1 ;  
