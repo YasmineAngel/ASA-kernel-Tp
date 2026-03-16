@@ -1,16 +1,19 @@
 #include "main.h"
 #include "syscall.h"
 void puts(char *s) ;
+void overflow(void); 
 
 
 char user_stack[65536] __attribute__((section(".user_data")));
 __attribute__((section(".user_text")))
+
 void user_main() {
     puts("Hello world from user land!\n");
         putc('A');
     putc('B');
     putc('C');
     putc('\n');
+    overflow();
     for(;;);
 
 }
@@ -40,4 +43,10 @@ void clear_screen(void) {
         : 
         : "a"(2)
     );
+}
+
+__attribute__((section(".user_text")))
+void overflow() {
+    volatile int keep_going = 1;
+    if (keep_going) overflow();
 }

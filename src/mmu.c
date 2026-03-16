@@ -67,7 +67,8 @@ void setup_mmu() {
         user_page_table[idx].mode = 1;
     }
 
-    int guard_idx = addr_to_page((void *)&_user_stack_guard) - 1 - 1024;
+    uint32_t guard_addr = ((uint32_t)&_user_stack_guard + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+    int guard_idx = addr_to_page((void *)guard_addr) - 1024;
     user_page_table[guard_idx].valid = 0;
 
     page_directory[0].physical_page = ((uint32_t)page_entry) >> 12;
