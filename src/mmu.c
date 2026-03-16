@@ -91,10 +91,16 @@ void setup_mmu() {
 }
 
 void page_fault_handler(const int_regs_t *r) {
-    uint32_t faulting_address;
-    asm volatile("mov %%cr2, %0" : "=r" (faulting_address));
 
+    uint32_t faulting_address = (uint32_t)get_cr2();
+    uint32_t stack_bottom = (uint32_t)&_user_stack_guard;
+    uint32_t guard_addr = (stack_bottom + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+    
+    if (faulting_address >= guard_addr && faulting_address < guard_addr + PAGE_SIZE) {
+        kputs("\nStack overflow\n");
+    } else {
     kputs("\nPage fault\n");
+    }
     kputs("Error accessing address: ");
     puthex(faulting_address);
     kputs("\nInstruction pointer (EIP): ");
@@ -114,5 +120,9 @@ int addr_to_page(void *addr) {
     return (uint32_t)addr / PAGE_SIZE;
 }
 
-
+void *get_cr2() {
+    uint32_t cr2;
+    asm volatile("mov %%cr2, %0" : "=r"(cr2));
+    return (void *)cr2;
+}
 
