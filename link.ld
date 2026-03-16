@@ -36,6 +36,7 @@ SECTIONS
 	{
         _user_start = .;
         *(.user_text)
+		_user_stack_guard = .;
 		*(.user_data)
         . = ALIGN(4096);
         _user_end = .;

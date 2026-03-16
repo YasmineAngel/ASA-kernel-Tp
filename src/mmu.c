@@ -4,6 +4,8 @@
 
 extern char _begin_of_user_space;
 extern char _end_of_user_space;
+extern char _user_stack_guard;
+
 
 struct Directory_Entry_s {
     uint32_t valid_entry      : 1 ;  
@@ -64,6 +66,9 @@ void setup_mmu() {
         user_page_table[idx].read_write = 1;
         user_page_table[idx].mode = 1;
     }
+
+    int guard_idx = addr_to_page((void *)&_user_stack_guard) - 1 - 1024;
+    user_page_table[guard_idx].valid = 0;
 
     page_directory[0].physical_page = ((uint32_t)page_entry) >> 12;
     page_directory[0].valid_entry = 1;
