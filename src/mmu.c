@@ -150,3 +150,9 @@ void *alloc_page() {
     page_alloc[page] = -1;
     return page_to_addr(page);
 }
+
+void free_page(void *addr) {
+    int page = addr_to_page(addr);
+    page_alloc[page] = first_free_page;
+    first_free_page = page;
+}
