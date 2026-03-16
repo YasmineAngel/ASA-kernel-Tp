@@ -6,7 +6,8 @@ extern char _begin_of_user_space;
 extern char _end_of_user_space;
 extern char _user_stack_guard;
 
-int page_alloc[4096];
+#define MAX_PAGES 4096
+int page_alloc[MAX_PAGES];
 int first_free_page;
 
 
@@ -83,6 +84,17 @@ void setup_mmu() {
     page_directory[1].valid_entry = 1;
     page_directory[1].read_write = 1;
     page_directory[1].mode = 1;
+
+    for (int i = 0; i < last_page; i++) {
+    page_alloc[i] = -1;
+    }
+
+    for (int i = last_page; i < MAX_PAGES - 1; i++) {
+    page_alloc[i] = i + 1;
+    }
+    page_alloc[MAX_PAGES - 1] = -1;
+
+    first_free_page = last_page;
 
     uint32_t pd_addr = (uint32_t)page_directory;
     asm volatile("mov %0, %%cr3" : : "r"(pd_addr));
