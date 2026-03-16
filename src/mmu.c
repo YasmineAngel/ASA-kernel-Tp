@@ -88,7 +88,7 @@ void setup_mmu() {
     for (int i = 0; i < last_page; i++) {
     page_alloc[i] = -1;
     }
-    
+
     for (int i = last_page; i < MAX_PAGES - 1; i++) {
     page_alloc[i] = i + 1;
     }
@@ -141,3 +141,12 @@ void *get_cr2() {
     return (void *)cr2;
 }
 
+void *alloc_page() {
+    if (first_free_page == -1) {
+        return (void *)-1;  
+    }
+    int page = first_free_page;
+    first_free_page = page_alloc[page];
+    page_alloc[page] = -1;
+    return page_to_addr(page);
+}
