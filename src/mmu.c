@@ -89,5 +89,13 @@ void page_fault_handler(const int_regs_t *r) {
 
 }
 
+void *page_to_addr(int page) {
+    return (void *)(page * PAGE_SIZE);
+}
+
+int addr_to_page(void *addr) {
+    return (uint32_t)addr / PAGE_SIZE;
+}
+
 
 
