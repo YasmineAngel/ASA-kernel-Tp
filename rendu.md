@@ -113,5 +113,9 @@ Extension dynamique de pile
 
 ## Q34 Pile d'appel virtuelle
 
-%% à completer
+user_page_table has 1024 entries, so the last entry is index 1023. This corresponds to virtual page 1024 + 1023 = 2047
+The virtual address of this last page is:
+page 2047 × 4096 = 0x007FF000 = 0000 0000 0111 1111 1111 0000 0000 0000
+idx1 (bits 31-22)    = 0000000001 = 1
+idx2 (bits 21-12)  = 1111111111 = 1023
 
