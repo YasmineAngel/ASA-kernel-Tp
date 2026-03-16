@@ -101,7 +101,12 @@ protection de pile
 
 ## Q29 Analyse
 
-%% à completer
+ - Detecting stack overflow : by placing a specific value at the bottom of the stack during initialization then we keep checking if that value . If it's unchabged = no stackoverflow , yes otherwise .
+ - Advantages and Disadvantages : 
+    - advantage : The non MMU method requires us to call it each time to check but with MMU it's automatic .
+    - advantage : The kernel immediately stops and gives error unlike the other method where it allows the rewriting of of the global variables/functions
+    - disadvantage : We waste the memory of the last page 
+    - disatvantage: It cannot detect overflows that skip over the guard page entirely
 
 Extension dynamique de pile
 ---------------------------
