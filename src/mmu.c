@@ -88,7 +88,7 @@ void setup_mmu() {
     for (int i = 0; i < last_page; i++) {
     page_alloc[i] = -1;
     }
-
+    
     for (int i = last_page; i < MAX_PAGES - 1; i++) {
     page_alloc[i] = i + 1;
     }
