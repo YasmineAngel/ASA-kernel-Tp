@@ -30,6 +30,8 @@ SECTIONS
 	}
 	. = 0x00400000;
 
+	_begin_of_user_space = .;
+
 	.user : AT(ADDR(.user))
 	{
         _user_start = .;
@@ -38,5 +40,9 @@ SECTIONS
         . = ALIGN(4096);
         _user_end = .;
     }
+
+	_end_of_user_space = .;
+
+
 	end = .; _end = .; __end = .;
 }
