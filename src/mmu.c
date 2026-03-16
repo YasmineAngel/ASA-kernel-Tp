@@ -2,7 +2,8 @@
 #include "mmu.h"
 #include "main.h"
 
-
+extern char _begin_of_user_space;
+extern char _end_of_user_space;
 
 struct Directory_Entry_s {
     uint32_t valid_entry      : 1 ;  
@@ -47,11 +48,21 @@ void setup_mmu() {
         page_entry[j].read_write = 1;     
         page_entry[j].mode = 0;           
     }
+
     for (int j = 0; j < 1024; j++) {
-        user_page_table[j].physical_page = 1024 + j; 
-        user_page_table[j].valid = 1;          
-        user_page_table[j].read_write = 1;
-        user_page_table[j].mode = 1;
+        user_page_table[j].valid = 0;
+    }
+
+
+    int first_page = addr_to_page((void *)&_begin_of_user_space);
+    int last_page  = addr_to_page((void *)&_end_of_user_space);
+
+    for (int j = first_page; j < last_page; j++) {
+        int idx = j - 1024;
+        user_page_table[idx].physical_page = j; 
+        user_page_table[idx].valid = 1;          
+        user_page_table[idx].read_write = 1;
+        user_page_table[idx].mode = 1;
     }
 
     page_directory[0].physical_page = ((uint32_t)page_entry) >> 12;
