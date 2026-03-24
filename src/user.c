@@ -2,6 +2,7 @@
 #include "syscall.h"
 void puts(char *s) ;
 void overflow(void); 
+int getpid(void);
 
 
 __attribute__((section(".user_text")))
@@ -11,6 +12,10 @@ void user_main() {
         putc('A');
     putc('B');
     putc('C');
+    putc('\n');
+    int pid = getpid();
+    puts("pid: ");
+    putc('0' + pid);
     putc('\n');
     //overflow();
     for(;;);
@@ -48,4 +53,15 @@ __attribute__((section(".user_text")))
 void overflow() {
     volatile int keep_going = 1;
     if (keep_going) overflow();
+}
+
+__attribute__((section(".user_text")))
+int getpid() {
+    int pid =0;
+    asm volatile(
+        "int $87"
+        :
+        : "d"(&pid), "a"(3)
+    );
+    return pid;
 }

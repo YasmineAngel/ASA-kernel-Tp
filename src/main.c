@@ -139,6 +139,9 @@ void sys_call_handler(int_regs_t *r) {
         case SYS_CLEAR:
             kclear_screen();
             break;
+        case SYS_GETPID:
+            *((int *)r->edx) = current_ctx->pid;
+            break;
     }
 }
 
