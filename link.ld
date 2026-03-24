@@ -32,6 +32,10 @@ SECTIONS
 
 	_begin_of_user_space = .;
 
+    . = 0x00403000;
+    _kernel_stack = .;
+    . = 0x00404000;            
+
 	.user : AT(ADDR(.user))
 	{
         _user_start = .;

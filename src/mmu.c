@@ -5,6 +5,7 @@
 extern char _begin_of_user_space;
 extern char _end_of_user_space;
 extern char _user_stack_guard;
+extern char _user_start;
 
 #define MAX_PAGES 4096
 int page_alloc[MAX_PAGES];
@@ -34,8 +35,15 @@ void setup_mmu() {
     }
 
 
-    int first_page = addr_to_page((void *)&_begin_of_user_space);
+    int first_page = addr_to_page((void *)&_user_start);
     int last_page  = addr_to_page((void *)&_end_of_user_space);
+
+    for (int j = 0; j < 4; j++) {
+    user_page_table[j].physical_page = 1024 + j;
+    user_page_table[j].valid = 1;
+    user_page_table[j].read_write = 1;
+    user_page_table[j].mode = 0;
+    }
 
     for (int j = first_page; j < last_page; j++) {
         int idx = j - 1024;
@@ -60,11 +68,11 @@ void setup_mmu() {
     page_directory[1].mode = 1;
 
     for (int i = 0; i < last_page; i++) {
-    page_alloc[i] = -1;
+        page_alloc[i] = -1;
     }
 
     for (int i = last_page; i < MAX_PAGES - 1; i++) {
-    page_alloc[i] = i + 1;
+        page_alloc[i] = i + 1;
     }
     page_alloc[MAX_PAGES - 1] = -1;
 
