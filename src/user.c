@@ -12,7 +12,7 @@ void user_main() {
     putc('B');
     putc('C');
     putc('\n');
-    overflow();
+    //overflow();
     for(;;);
 
 }

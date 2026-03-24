@@ -8,6 +8,7 @@ int   addr_to_page(void *addr);
 void *get_cr2();
 void *alloc_page();
 void free_page(void *addr);
+void page_copy(char *pg_src, char *pg_dst);
 extern char _begin_of_user_space;
 extern char _end_of_user_space;
 extern char _user_stack_guard;

@@ -172,3 +172,19 @@ void free_page(void *addr) {
     page_alloc[page] = first_free_page;
     first_free_page = page;
 }
+
+
+void page_copy(char *pg_src, char *pg_dst) {
+    uint32_t cr0;
+    asm volatile("mov %%cr0, %0" : "=r"(cr0));
+    cr0 &= ~0x80000000;
+    asm volatile("mov %0, %%cr0" : : "r"(cr0));
+
+    for (int i = 0; i < PAGE_SIZE; i++) {
+        pg_dst[i] = pg_src[i];
+    }
+
+    asm volatile("mov %%cr0, %0" : "=r"(cr0));
+    cr0 |= 0x80000000;
+    asm volatile("mov %0, %%cr0" : : "r"(cr0));
+}
