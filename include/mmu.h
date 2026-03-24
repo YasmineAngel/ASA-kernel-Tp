@@ -32,6 +32,9 @@ struct Page_Entry_s {
 struct Page_Directory_s {
     struct Directory_Entry_s entries[1024];
 };
+
+extern struct Directory_Entry_s page_directory[1024];
+
 void setup_mmu(void);
 void page_fault_handler(int_regs_t *r);
 void *page_to_addr(int page);
@@ -41,6 +44,7 @@ void *alloc_page();
 void free_page(void *addr);
 void page_copy(char *pg_src, char *pg_dst);
 struct Page_Directory_s *clone_page_directory(struct Page_Directory_s *src_pd);
+void free_page_directory(struct Page_Directory_s *src_pd);
 extern char _begin_of_user_space;
 extern char _end_of_user_space;
 extern char _user_stack_guard;

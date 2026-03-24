@@ -169,6 +169,11 @@ struct Page_Directory_s *clone_page_directory(struct Page_Directory_s *src_pd){
     struct Page_Directory_s *new_pd = alloc_page();
     struct Page_Entry_s *new_upt = alloc_page();
 
+    uint32_t cr0;
+    asm volatile("mov %%cr0, %0" : "=r"(cr0));
+    cr0 &= ~0x80000000;
+    asm volatile("mov %0, %%cr0" : : "r"(cr0));
+
     new_pd->entries[0] = src_pd->entries[0];
 
     for (int i = 1; i < 1024; i++) {
@@ -186,8 +191,9 @@ struct Page_Directory_s *clone_page_directory(struct Page_Directory_s *src_pd){
         if (src_upt[i].valid) {
             char *new_page = alloc_page();
             char *src_page = (char *)(src_upt[i].physical_page << 12);
-            page_copy(src_page, new_page);
-            new_upt[i].physical_page = ((uint32_t)new_page) >> 12;
+            for (int j = 0; j < PAGE_SIZE; j++) {
+                new_page[j] = src_page[j];
+            }            new_upt[i].physical_page = ((uint32_t)new_page) >> 12;
             new_upt[i].valid = 1;
             new_upt[i].read_write = 1;
             new_upt[i].mode = 1;
@@ -196,5 +202,30 @@ struct Page_Directory_s *clone_page_directory(struct Page_Directory_s *src_pd){
         }
     }
 
+    cr0 |= 0x80000000;
+    asm volatile("mov %0, %%cr0" : : "r"(cr0));
     return new_pd;
+}
+
+void free_page_directory(struct Page_Directory_s *src_pd) {
+
+    uint32_t cr0;
+    asm volatile("mov %%cr0, %0" : "=r"(cr0));
+    cr0 &= ~0x80000000;
+    asm volatile("mov %0, %%cr0" : : "r"(cr0));
+
+    struct Page_Entry_s *upt = (struct Page_Entry_s *)(src_pd->entries[1].physical_page << 12);
+
+    for (int i = 0; i < 1024; i++) {
+        if (upt[i].valid) {
+            free_page((void *)(upt[i].physical_page << 12));
+        }
+    }
+
+    free_page(upt);
+
+    cr0 |= 0x80000000;
+    asm volatile("mov %0, %%cr0" : : "r"(cr0));
+
+    free_page(src_pd);
 }
