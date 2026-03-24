@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include "mmu.h"
 
+#define MAX_CTX 10
+
 struct ctx_s {
     int pid;           
     uint32_t cr3;        
@@ -13,5 +15,9 @@ struct ctx_s {
 };
 
 extern struct ctx_s *current_ctx;
+
+void init_ctx();
+struct ctx_s *alloc_ctx();
+void free_ctx(struct ctx_s *ctx);
 
 #endif

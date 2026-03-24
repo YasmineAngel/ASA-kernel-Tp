@@ -1,3 +1,30 @@
 #include "ctx.h"
 
 struct ctx_s *current_ctx ;
+struct ctx_s ctxs[MAX_CTX];
+struct ctx_s *first_free_ctx = NULL;
+
+static int next_pid = 1;
+
+void init_ctx() {
+    for (int i = 0; i < MAX_CTX - 1; i++) {
+        ctxs[i].next = &ctxs[i + 1];
+    }
+    ctxs[MAX_CTX - 1].next = NULL;
+    first_free_ctx = &ctxs[0];
+}
+
+struct ctx_s *alloc_ctx() {
+    if (first_free_ctx == NULL) {
+        return NULL;
+    }
+    struct ctx_s *ctx = first_free_ctx;
+    first_free_ctx = first_free_ctx->next;
+    ctx->pid = next_pid++;
+    return ctx;
+}
+
+void free_ctx(struct ctx_s *ctx) {
+    ctx->next = first_free_ctx;
+    first_free_ctx = ctx;
+}
