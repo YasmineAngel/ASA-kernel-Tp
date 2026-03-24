@@ -4,6 +4,7 @@
 #include "mmu.h"
 #include "call_user.h"
 #include "syscall.h"
+#include "ctx.h"
 
 extern char _user_start;
 extern char _user_end;
@@ -42,7 +43,11 @@ void main(unsigned int * mboot_info)
     __asm volatile("sti");
 
     /* minimal setup done ! */
-    
+    init_ctx();
+    struct ctx_s *ctx = alloc_ctx();
+    ctx->cr3 = (uint32_t)page_directory;
+    ctx->next = ctx;
+    current_ctx = ctx;
     kputs("Jumping to user land...\n");
     kputs("_user_start is at: ");
     puthex((uint32_t)&_user_start);
