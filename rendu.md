@@ -62,31 +62,53 @@ Correction
 
 ## Q18 chercher la faute
 - The error I got: 
+
     jumping to user land ...
+
     user_start is at 400000 
+
     page fault 
+
     error accessing addres 102000
+
     instruction pointer (EIP) 102000
 
+
 - The shell commands I use to determmine the problem : 
+
     - nm iso/boot/mykernel.bin | sort | grep -i "102000" -> result : 00102000 T __x86.get_pc_thunk.ax
+
     - objdump -d -S iso/boot/mykernel.bin | grep -A10 "102000" -> result : in the main function : 
+
         400007:	e8 f4 1f d0 ff       	call   102000 <__x86.get_pc_thunk.ax>
+
         40000c:	05 f4 2f d0 ff       	add    $0xffd02ff4,%eax
+
         puts("Hello world from user land!\n");
+
     - I fixed it by removing -fPIC  from the makefile  znf replacing it with -fno-pic to force gcc to never generate PIC code (Our compiler was generating "position-independent" executables. Position-independent means the operating system can load the program's machine code at any address in (virtual) memory and it'll still work) 
+
 - After running the command make and make run i got this :
+
     jumping to user land ...
+
     user_start is at 400000 
+
     page fault 
+
     error accessing addres 100FC5
+
     instruction pointer (EIP) 100FC5
+
 - The shell commands I use to determmine the problem : 
+
     - nm iso/boot/mykernel.bin | sort | grep -i "100FC5" -> result : 00100fc5 T puts
+
     this is the address of the puts function .
 
 ## Q19 
- I had an issue that I fixed by switching the declerations of the functions in user.c : user_main was defined after puts in user.c, so puts landed at 0x400000 = _user_start. so I moved user_main before puts in the source file so it is the first function placed at 0x400000.
+ I had an issue that I fixed by switching the declerations of the functions in user.c :
+  user_main was defined after puts in user.c, so puts landed at 0x400000 = _user_start. so I moved user_main before puts in the source file so it is the first function placed at 0x400000.
 
 
 Interposition
@@ -113,9 +135,28 @@ Extension dynamique de pile
 
 ## Q34 Pile d'appel virtuelle
 
+**part1**
+
 user_page_table has 1024 entries, so the last entry is index 1023. This corresponds to virtual page 1024 + 1023 = 2047
+
 The virtual address of this last page is:
+
 page 2047 × 4096 = 0x007FF000 = 0000 0000 0111 1111 1111 0000 0000 0000
+
 idx1 (bits 31-22)    = 0000000001 = 1
+
 idx2 (bits 21-12)  = 1111111111 = 1023
 
+**part2**
+
+Assuming that the push instruction decrements the stack top before writing the value : 
+
+esp = esp - 4
+
+*esp = value
+
+For the first push to write into page 0x007FF000, the stack pointer must start one byte above that page, at the very start of the next page:
+
+esp = 0x00800000
+
+This way the first push decrements esp to 0x007FFFFC which is inside the last page of user_page_table , so the MMU maps it correctly.
