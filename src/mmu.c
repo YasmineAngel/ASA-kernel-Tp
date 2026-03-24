@@ -11,32 +11,6 @@ int page_alloc[MAX_PAGES];
 int first_free_page;
 
 
-struct Directory_Entry_s {
-    uint32_t valid_entry      : 1 ;  
-    uint32_t read_write       : 1 ;  
-    uint32_t mode             : 1 ;  
-    uint32_t cache_management : 1 ;  
-    uint32_t cache_disabled   : 1 ;  
-    uint32_t used_entries     : 1 ;  
-    uint32_t ignored          : 1 ;  
-    uint32_t page_size        : 1 ;  
-    uint32_t not_used         : 4 ;  
-    uint32_t physical_page    : 20 ; 
-};
-
-struct Page_Entry_s {
-    uint32_t valid            : 1 ;  
-    uint32_t read_write       : 1 ;  
-    uint32_t mode             : 1 ;  
-    uint32_t cache_management : 1 ;  
-    uint32_t cache_disabled   : 1 ;  
-    uint32_t read_page        : 1 ;  
-    uint32_t dirty_bit        : 1 ; 
-    uint32_t ignored          : 1 ;  
-    uint32_t global           : 1 ;  
-    uint32_t not_used         : 3 ;  
-    uint32_t physical_page    : 20 ; 
-};
 
 #define PAGE_SIZE 4096 
 struct Directory_Entry_s page_directory[1024] __attribute__((aligned (PAGE_SIZE)));
@@ -187,4 +161,41 @@ void page_copy(char *pg_src, char *pg_dst) {
     asm volatile("mov %%cr0, %0" : "=r"(cr0));
     cr0 |= 0x80000000;
     asm volatile("mov %0, %%cr0" : : "r"(cr0));
+}
+
+
+struct Page_Directory_s *clone_page_directory(struct Page_Directory_s *src_pd){
+
+    struct Page_Directory_s *new_pd = alloc_page();
+    struct Page_Entry_s *new_upt = alloc_page();
+
+    new_pd->entries[0] = src_pd->entries[0];
+
+    for (int i = 1; i < 1024; i++) {
+        new_pd->entries[i].valid_entry = 0;
+    }
+
+    new_pd->entries[1].physical_page = ((uint32_t)new_upt) >> 12;
+    new_pd->entries[1].valid_entry = 1;
+    new_pd->entries[1].read_write = 1;
+    new_pd->entries[1].mode = 1;
+
+    struct Page_Entry_s *src_upt = (struct Page_Entry_s *)(src_pd->entries[1].physical_page << 12);
+
+    for (int i = 0; i < 1024; i++) {
+        if (src_upt[i].valid) {
+            char *new_page = alloc_page();
+            char *src_page = (char *)(src_upt[i].physical_page << 12);
+            page_copy(src_page, new_page);
+            new_upt[i].physical_page = ((uint32_t)new_page) >> 12;
+            new_upt[i].valid = 1;
+            new_upt[i].read_write = 1;
+            new_upt[i].mode = 1;
+        } else {
+            new_upt[i].valid = 0;
+        }
+    }
+
+    return new_pd;
+
 }
