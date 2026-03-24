@@ -4,7 +4,6 @@ void puts(char *s) ;
 void overflow(void); 
 
 
-char user_stack[65536] __attribute__((section(".user_data")));
 __attribute__((section(".user_text")))
 
 void user_main() {

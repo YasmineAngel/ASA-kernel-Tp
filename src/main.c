@@ -48,7 +48,7 @@ void main(unsigned int * mboot_info)
     puthex((uint32_t)&_user_start);
     kputs("\n");
     kputs("calling user\n");
-    call_user((void (*)())&_user_start, (void*)0x00410000);
+    call_user((void (*)())&_user_start, (void*)0x00800000);
     kputs("Going idle\n");
     for(;;) ; /* nothing more to do... really nothing ! */
 }

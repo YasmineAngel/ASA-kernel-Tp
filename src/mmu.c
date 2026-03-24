@@ -106,12 +106,28 @@ void setup_mmu() {
 }
 
 void page_fault_handler(const int_regs_t *r) {
-
-    uint32_t faulting_address = (uint32_t)get_cr2();
-    uint32_t stack_bottom = (uint32_t)&_user_stack_guard;
-    uint32_t guard_addr = (stack_bottom + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
     
-    if (faulting_address >= guard_addr && faulting_address < guard_addr + PAGE_SIZE) {
+    uint32_t faulting_address = (uint32_t)get_cr2();
+    uint32_t stack_top   = 0x00800000;
+    uint32_t stack_limit = stack_top - 0x100000;
+    
+    if (faulting_address > stack_limit && faulting_address < stack_top) {
+        kputs("\nAllocating new page !\n");
+        void *new_page = alloc_page();
+
+        int idx2 = addr_to_page((void *)faulting_address) - 1024;
+        user_page_table[idx2].physical_page = addr_to_page(new_page);
+        user_page_table[idx2].valid = 1;
+        user_page_table[idx2].read_write = 1;
+        user_page_table[idx2].mode = 1;
+
+        uint32_t cr3;
+        asm volatile("mov %%cr3, %0" : "=r"(cr3));
+        asm volatile("mov %0, %%cr3" : : "r"(cr3));
+
+        return;
+
+    } else if (faulting_address >= stack_limit - PAGE_SIZE && faulting_address <= stack_limit) {
         kputs("\nStack overflow\n");
     } else {
     kputs("\nPage fault\n");
