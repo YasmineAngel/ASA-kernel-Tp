@@ -1,4 +1,6 @@
 #include "ctx.h"
+#include "mmu.h"
+
 
 struct ctx_s *current_ctx ;
 struct ctx_s ctxs[MAX_CTX];
@@ -35,6 +37,20 @@ void switch_to(struct ctx_s *ctx) {
         "mov %%ebp, %1\n"
         : "=r"(current_ctx->esp), "=r"(current_ctx->ebp)
     );
+
+    if (ctx == NULL) {
+        struct ctx_s *clone = alloc_ctx();
+        clone->cr3 = (uint32_t)clone_page_directory(
+            (struct Page_Directory_s *)current_ctx->cr3
+        );
+        clone->esp = current_ctx->esp;
+        clone->ebp = current_ctx->ebp;
+        clone->next = current_ctx->next;
+        current_ctx->next = clone;
+
+        return;
+    }
+
 
     current_ctx = ctx;
 
