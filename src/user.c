@@ -5,13 +5,14 @@ void puts(char *s) ;
 void overflow(void); 
 int getpid(void);
 void yield(void);
+void fork();
 
 
 __attribute__((section(".user_text")))
 
 void user_main() {
     puts("Hello world from user land!\n");
-        putc('A');
+    putc('A');
     putc('B');
     putc('C');
     putc('\n');
@@ -76,5 +77,16 @@ void yield() {
         "int $87"
         :
         : "a"(4)
+    );
+}
+
+void fork(void);
+
+__attribute__((section(".user_text")))
+void fork() {
+    asm volatile(
+        "int $87"
+        :
+        : "a"(5)
     );
 }

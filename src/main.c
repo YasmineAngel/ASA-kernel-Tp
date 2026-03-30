@@ -145,6 +145,9 @@ void sys_call_handler(int_regs_t *r) {
         case SYS_YIELD:
             kyield();
             break;
+        case SYS_FORK:
+            kfork();
+            break;
     }
 }
 

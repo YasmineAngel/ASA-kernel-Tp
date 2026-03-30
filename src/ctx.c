@@ -66,3 +66,7 @@ void switch_to(struct ctx_s *ctx) {
 void kyield() {
     switch_to(current_ctx->next);
 }
+
+void kfork() {
+    switch_to(NULL);
+}
