@@ -4,6 +4,7 @@
 void puts(char *s) ;
 void overflow(void); 
 int getpid(void);
+void yield(void);
 
 
 __attribute__((section(".user_text")))
@@ -19,6 +20,8 @@ void user_main() {
     putc('0' + pid);
     putc('\n');
     //overflow();
+    yield();
+    puts("back from yield!\n");
     for(;;);
 
 }
@@ -65,4 +68,13 @@ int getpid() {
         : "d"(&pid), "a"(3)
     );
     return pid;
+}
+
+__attribute__((section(".user_text")))
+void yield() {
+    asm volatile(
+        "int $87"
+        :
+        : "a"(4)
+    );
 }

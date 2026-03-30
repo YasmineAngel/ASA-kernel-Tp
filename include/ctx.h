@@ -20,5 +20,6 @@ void init_ctx();
 struct ctx_s *alloc_ctx();
 void free_ctx(struct ctx_s *ctx);
 void switch_to(struct ctx_s *ctx);
+void kyield();
 
 #endif

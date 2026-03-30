@@ -142,6 +142,9 @@ void sys_call_handler(int_regs_t *r) {
         case SYS_GETPID:
             *((int *)r->edx) = current_ctx->pid;
             break;
+        case SYS_YIELD:
+            kyield();
+            break;
     }
 }
 

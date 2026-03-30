@@ -46,3 +46,7 @@ void switch_to(struct ctx_s *ctx) {
         : "r"(ctx->cr3), "r"(ctx->esp), "r"(ctx->ebp)
     );
 }
+
+void kyield() {
+    switch_to(current_ctx->next);
+}

@@ -5,5 +5,6 @@
 #define SYS_PUTC        1
 #define SYS_CLEAR       2
 #define SYS_GETPID      3
+#define SYS_YIELD       4
 
 #endif
