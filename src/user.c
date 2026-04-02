@@ -6,6 +6,7 @@ void overflow(void);
 int getpid(void);
 void yield(void);
 int fork(void);
+void exit(void);
 
 
 __attribute__((section(".user_text")))
@@ -15,7 +16,8 @@ void user_main() {
     int pid = fork();
     
     if (pid == 0) {
-        puts("I am the child process!\n");
+        puts("I am the child process! Exiting now...\n");
+        exit();
     } else {
         puts("I am the parent process, child pid is: ");
         putc('0' + pid);
@@ -23,7 +25,9 @@ void user_main() {
     }
     
     yield();
-    puts("back from yield!\n");
+    puts("Parent : back from yield!\n");
+    puts("Parent exiting now...\n");
+    exit();
     for(;;);
 }
 
@@ -92,4 +96,14 @@ int fork() {
         : "a"(5)
     );
     return ret;
+}
+
+__attribute__((section(".user_text")))
+void exit() {
+    asm volatile(
+        "int $87"
+        :
+        : "a"(SYS_EXIT)
+    );
+    for(;;);
 }

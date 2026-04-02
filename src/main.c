@@ -8,6 +8,7 @@
 
 extern char _user_start;
 extern char _user_end;
+extern void _entry_point();
 void kclear_screen();				/* clear screen */
 void kputc(char aChar);				/* print a single char on screen */
 void kputs(char *aString);			/* print a string on the screen */
@@ -147,6 +148,9 @@ void sys_call_handler(int_regs_t *r) {
             break;
         case SYS_FORK:
             *(uint32_t *)(&r->eax) = kfork();
+            break;
+        case SYS_EXIT:
+            kexit();
             break;
     }
 }

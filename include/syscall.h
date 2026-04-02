@@ -7,6 +7,7 @@
 #define SYS_GETPID      3
 #define SYS_YIELD       4
 #define SYS_FORK        5
+#define SYS_EXIT        6
 
 
 #endif

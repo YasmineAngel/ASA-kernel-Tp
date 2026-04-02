@@ -22,5 +22,6 @@ void free_ctx(struct ctx_s *ctx);
 int switch_to(struct ctx_s *ctx);
 void kyield();
 int kfork();
+void kexit();
 
 #endif
