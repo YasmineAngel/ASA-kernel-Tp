@@ -7,7 +7,13 @@ int getpid(void);
 void yield(void);
 int fork(void);
 void exit(void);
+void user_main(void); 
 
+__attribute__((section(".user_text")))
+void _entry_point() {
+    user_main(); 
+    exit();     
+}
 
 __attribute__((section(".user_text")))
 void user_main() {
@@ -16,8 +22,8 @@ void user_main() {
     int pid = fork();
     
     if (pid == 0) {
-        puts("I am the child process! Exiting now...\n");
-        exit();
+        puts("I am the child process! Returning naturally now...\n");
+        return; 
     } else {
         puts("I am the parent process, child pid is: ");
         putc('0' + pid);
@@ -26,9 +32,9 @@ void user_main() {
     
     yield();
     puts("Parent : back from yield!\n");
-    puts("Parent exiting now...\n");
-    exit();
-    for(;;);
+    
+    puts("Parent returning naturally now...\n");
+    return; 
 }
 
 __attribute__((section(".user_text")))

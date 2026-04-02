@@ -6,6 +6,7 @@
 #include "syscall.h"
 #include "ctx.h"
 
+
 extern char _user_start;
 extern char _user_end;
 extern void _entry_point();
@@ -54,7 +55,7 @@ void main(unsigned int * mboot_info)
     puthex((uint32_t)&_user_start);
     kputs("\n");
     kputs("calling user\n");
-    call_user((void (*)())&_user_start, (void*)0x00800000);
+    call_user((void (*)())&_entry_point, (void*)0x00800000);
     kputs("Going idle\n");
     for(;;) ; /* nothing more to do... really nothing ! */
 }
