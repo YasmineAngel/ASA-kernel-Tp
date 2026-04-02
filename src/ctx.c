@@ -1,8 +1,8 @@
 #include "ctx.h"
 #include "mmu.h"
+#include "main.h"
 
-
-struct ctx_s *current_ctx ;
+struct ctx_s *current_ctx;
 struct ctx_s ctxs[MAX_CTX];
 struct ctx_s *first_free_ctx = NULL;
 
@@ -31,7 +31,7 @@ void free_ctx(struct ctx_s *ctx) {
     first_free_ctx = ctx;
 }
 
-void switch_to(struct ctx_s *ctx) {
+int switch_to(struct ctx_s *ctx) {
     asm volatile(
         "mov %%esp, %0\n"
         "mov %%ebp, %1\n"
@@ -48,9 +48,8 @@ void switch_to(struct ctx_s *ctx) {
         clone->next = current_ctx->next;
         current_ctx->next = clone;
 
-        return;
+        return clone->pid; 
     }
-
 
     current_ctx = ctx;
 
@@ -58,15 +57,16 @@ void switch_to(struct ctx_s *ctx) {
         "mov %0, %%cr3\n"
         "mov %1, %%esp\n"
         "mov %2, %%ebp\n"
-        :
-        : "r"(ctx->cr3), "r"(ctx->esp), "r"(ctx->ebp)
+        : : "r"(ctx->cr3), "r"(ctx->esp), "r"(ctx->ebp)
     );
+    
+    return 0; 
 }
 
 void kyield() {
     switch_to(current_ctx->next);
 }
 
-void kfork() {
-    switch_to(NULL);
+int kfork() {
+   return switch_to(NULL);
 }

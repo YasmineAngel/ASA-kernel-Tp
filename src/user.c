@@ -5,26 +5,26 @@ void puts(char *s) ;
 void overflow(void); 
 int getpid(void);
 void yield(void);
-void fork();
+int fork(void);
 
 
 __attribute__((section(".user_text")))
-
 void user_main() {
     puts("Hello world from user land!\n");
-    putc('A');
-    putc('B');
-    putc('C');
-    putc('\n');
-    int pid = getpid();
-    puts("pid: ");
-    putc('0' + pid);
-    putc('\n');
-    //overflow();
+    
+    int pid = fork();
+    
+    if (pid == 0) {
+        puts("I am the child process!\n");
+    } else {
+        puts("I am the parent process, child pid is: ");
+        putc('0' + pid);
+        putc('\n');
+    }
+    
     yield();
     puts("back from yield!\n");
     for(;;);
-
 }
 
 __attribute__((section(".user_text")))
@@ -80,13 +80,16 @@ void yield() {
     );
 }
 
-void fork(void);
+
+int fork(void);
 
 __attribute__((section(".user_text")))
-void fork() {
+int fork() {
+    int ret;
     asm volatile(
         "int $87"
-        :
+        : "=a"(ret)
         : "a"(5)
     );
+    return ret;
 }

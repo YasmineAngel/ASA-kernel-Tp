@@ -159,7 +159,7 @@ void gdt_init_default()
 
 static struct tss_s tss __attribute__((aligned (PAGE_SIZE)));;
 
-extern int _early_stack;
+extern int _kernel_stack;
 
 void setup_tss(struct gdt_entry_s *e) {
 	unsigned int tss_addr = (int) &tss;
@@ -168,7 +168,7 @@ void setup_tss(struct gdt_entry_s *e) {
 	for(i=0;i<sizeof(tss);i++)
 		*ptr++=0;
 	tss.ss0 = 0x10; /* kernel data segment */
-	tss.esp0 = ((int) &_early_stack);
+	tss.esp0 = ((int) &_kernel_stack);
 	e->base_high = (tss_addr >> 24) & 0xFF;
 	e->base_middle = (tss_addr >> 16) & 0xFF;
 	e->base_low = tss_addr & 0xFFFF;

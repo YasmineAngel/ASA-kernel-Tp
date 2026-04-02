@@ -146,10 +146,8 @@ void sys_call_handler(int_regs_t *r) {
             kyield();
             break;
         case SYS_FORK:
-            kfork();
+            *(uint32_t *)(&r->eax) = kfork();
             break;
     }
 }
-
-
 
