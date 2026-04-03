@@ -1,4 +1,4 @@
-Ce fichier est le rendu de <PRENOM> <NOM> & <PRENOM> <NOM>
+Ce fichier est le rendu de <Yasmine> <Boudour> 
 ==========================================================
 
 Définir des structures de données MMU
@@ -13,17 +13,25 @@ Définir un plan d'adressage
 ## Q5 Adresse de compilation
 
 from observing the link.ld file : the compiled code is tored at the physical address : 0x00100000
+
 The other sections should be stored consecutively after the .text section with a 4096 byte alignment .
 
 ## Q6 Mémoire virtuelle et noyau
 
 - Since the virtual address corresponds to physiscal address the idx1 and idx2 of the my-kernel code can be caclculated :
+
     - Kernel address = 0x00100000 = 0000 0000 0001 0000 0000 0000 0000 0000
+
     - idx1 (top 10 bits of the virtual address) : 0000 0000 00
+
     - idx2 (next 10 bits): 01 0000 0000
+
 - And the idx1 and idx2 of the video memory address used by putc:
+
     - Video memory address : 0xB8000 = 0000 0000 0000 1011 1000 0000 0000 0000
+
     - idx1 :  0000 0000 00
+
     - idx2 : 00 1011 1000
 
 
@@ -35,8 +43,11 @@ The number of memory pages that will configured is 1024 . Which corresponds to 1
 ## Q8 Plan d'adressage
 
 - Configuration of page directory table : 
+
     we are only required to configure the idx1 (the first 10 bits) which will point to corresponding physical address of the page_table
+
 - Configuration of page entry table : 
+
     Here we should configure all entries to the corresponding physiscal page where the first 20 bits correspond to the  physiscal page address (ex: page_table[0] points to physical address 0x00000000) , set the mode to kernel , set it as a valid entry and activate read/write bit .
 
 
@@ -107,8 +118,9 @@ Correction
     this is the address of the puts function .
 
 ## Q19 
- I had an issue that I fixed by switching the declerations of the functions in user.c :
-  user_main was defined after puts in user.c, so puts landed at 0x400000 = _user_start. so I moved user_main before puts in the source file so it is the first function placed at 0x400000.
+
+I had an issue that I fixed it by switching the declerations of the functions in user.c :
+user_main was defined after puts in user.c, so puts landed at 0x400000 = _user_start. so I moved user_main before puts in the source file so it is the first function placed at 0x400000.
 
 
 Interposition
@@ -123,12 +135,20 @@ protection de pile
 
 ## Q29 Analyse
 
- - Detecting stack overflow : by placing a specific value at the bottom of the stack during initialization then we keep checking if that value . If it's unchabged = no stackoverflow , yes otherwise .
+ - Detecting stack overflow : by placing a specific value at the bottom of the stack during initialization then we keep checking if that value . 
+ 
+ If it's unchabged = no stackoverflow , yes otherwise .
+
  - Advantages and Disadvantages : 
+
     - advantage : The non MMU method requires us to call it each time to check but with MMU it's automatic .
+
     - advantage : The kernel immediately stops and gives error unlike the other method where it allows the rewriting of of the global variables/functions
+
     - disadvantage : We waste the memory of the last page 
+
     - disatvantage: It cannot detect overflows that skip over the guard page entirely
+
 
 Extension dynamique de pile
 ---------------------------
@@ -160,3 +180,33 @@ For the first push to write into page 0x007FF000, the stack pointer must start o
 esp = 0x00800000
 
 This way the first push decrements esp to 0x007FFFFC which is inside the last page of user_page_table , so the MMU maps it correctly.
+
+
+## Q48
+
+It wasn't working until I switched early_stack to kernel-stack in the file gdt.c
+
+
+## Q51 
+
+**Why It's impossible ?**
+
+At the hardware level, isolation between the parent and child processes is enforced by the microprocessor's Memory Management Unit (MMU). When fork() creates the child process, the kernel allocates entirely new and distinct physical memory pages for the child's address space.
+
+Even though the parent and the child use the exact same virtual address in their C code to reference the secret variable, these virtual addresses are translated into two completely different physical addresses.
+
+When the scheduler switches execution to the child process, it updates the CPU's %cr3 register to point to the child's unique Page Directory. Consequently, even if the child process attempts to modify a variable at the exact same virtual address as the parent, the hardware MMU translates this virtual address to the child's private physical memory page.
+
+**before fork**
+
+When fork() is called, the kernel executes the clone_page_directory function. This function iterates through all the valid memory pages of the parent process. For each page, the kernel allocates a brand new, empty physical memory page and performs a copy of the parent's data into it. Because the secret variable was declared and initialized before the fork, its value existed in the parent's memory at the time of cloning. Therefore, the child receives an exact duplicate of that value in its newly allocated physical memory.
+
+**user.C**
+
+Before Fork: Parent initializes char secret = 'A';. (The kernel copies 'A' to the child's physical memory).
+
+After Fork (Child Execution): The child executes secret = 'Z'; and prints it. The MMU routes this write to the child's isolated physical page.
+
+After Fork (Parent Execution): The parent resumes, reads secret, and prints 'A'.
+
+This proves that the MMU is actively mapping their virtual addresses to two completely different physical ones. The child's modification was physically trapped inside its own isolated memory page.

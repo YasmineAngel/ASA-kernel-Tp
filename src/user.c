@@ -18,21 +18,33 @@ void _entry_point() {
 __attribute__((section(".user_text")))
 void user_main() {
     puts("Hello world from user land!\n");
+    char secret = 'A'; 
+    puts("Parent sets secret to : A\n");
     
     int pid = fork();
-    
+
     if (pid == 0) {
-        puts("I am the child process! Returning naturally now...\n");
+        puts("Hii I am Child process... \n");
+        puts("Child inherited the secret as: ");
+        putc(secret);
+        puts("\n");
+        puts("Child is now changing secret to: Z\n");
+        secret = 'Z';
+        puts("Child exiting...\n");
+
         return; 
+
     } else {
         puts("I am the parent process, child pid is: ");
         putc('0' + pid);
         putc('\n');
     }
-    
+
     yield();
-    puts("Parent : back from yield!\n");
-    
+    puts("Parent is back! Checking its own secret...\n");
+    puts("Parent process reads its secrets as: ");
+    putc(secret);
+    puts("\n");
     puts("Parent returning naturally now...\n");
     return; 
 }
